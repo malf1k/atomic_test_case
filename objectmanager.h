@@ -32,10 +32,14 @@ public:
 
     void printSeq(const Sequence& seq);
 
+
+
 private:
 
     Collection *m_queue = nullptr;
     Sequence *m_seq = nullptr;
+
+    void subseqJoining(Sequence &sorted_seq, const std::vector<Sequence>& sorted_subseq);
 
 
 };

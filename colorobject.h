@@ -7,6 +7,10 @@ enum class Color: char{
     BLUE = 3
 };
 
+/**
+ * @brief The ColorObject class
+ * Описывает объект содержащий цвет
+ */
 class ColorObject
 {
 public:
