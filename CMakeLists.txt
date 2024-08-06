@@ -5,7 +5,9 @@ project(atomic_test_case LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_executable(atomic_test_case main.cxx)
+add_executable(atomic_test_case main.cxx
+    colorobject.h colorobject.cxx
+    objectmanager.h objectmanager.cxx)
 
 include(GNUInstallDirs)
 install(TARGETS atomic_test_case
