@@ -24,7 +24,7 @@ public:
     void addSeqToQeue(const Sequence & seq);
 
 
-    ColorObject getSeqFromQueue();
+    Sequence getSeqFromQueue();
     Sequence sortSeqByRule(const Sequence& seq,
                            const Rule &rule =
                            {Color::RED, Color::GREEN, Color::BLUE}
@@ -37,7 +37,7 @@ public:
 private:
 
     Collection *m_queue = nullptr;
-    Sequence *m_seq = nullptr;
+    // Sequence *m_seq = nullptr;
 
     void subseqJoining(Sequence &sorted_seq, const std::vector<Sequence>& sorted_subseq);
 

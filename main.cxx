@@ -1,22 +1,19 @@
-#include <iostream>
 
-#include "colorobject.h"
+#include "objectmanager.h"
 
 using namespace std;
 
 int main()
 {
-    cout << "Hello World!" << endl;
+    ObjectManager om;
+    om.createRandomSeq();
 
-    ColorObject c1(Color::RED);
+    auto s = om.getSeqFromQueue();
 
-    shared_ptr<ColorObject> c2 ( new ColorObject(Color::BLUE));
+    auto ss = om.sortSeqByRule(s);
 
-    cout << "c2 color - " << static_cast<int> (c2->getColor()) << endl;
-    cout << "c1 color - " << static_cast<int> (c1.getColor()) << endl;
-
-
-
+    om.printSeq(s);
+    om.printSeq(ss);
 
     return 0;
 }
