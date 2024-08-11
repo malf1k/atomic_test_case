@@ -32,16 +32,14 @@ void ObjectManager::createRandomSeq(const int &number)
         seq.push_back(static_cast<Color>(dist(gen)));
 
 
-    log(std::this_thread::get_id(), __FUNCTION__, "before lock");
+    log("before lock", __FUNCTION__);
 
     std::unique_lock<std::mutex> lock(m_mt);
 
-    log(std::this_thread::get_id(), __FUNCTION__, "after lock");
+    log("after lock", __FUNCTION__);
 
     addSeqToQeue(seq);
-    // printSeq(seq);
-    // std::cout<< std::this_thread::get_id() << " Generating thread m_queue->size() "<< m_queue->size() << std::endl;
-    log(std::this_thread::get_id(), __FUNCTION__, "before notyfy_one");
+    log("before notyfy_one", __FUNCTION__);
     m_cv.notify_one();
 }
 
@@ -56,15 +54,14 @@ Sequence ObjectManager::getSeqFromQueue()
 {
     cnt ++;
     std::cout <<cnt << "\t";
-    log(std::this_thread::get_id(), __FUNCTION__, "lock(m_mt)");
-
+    log("lock(m_mt)", __FUNCTION__);
     std::unique_lock<std::mutex> lock(m_mt);
     m_cv.wait(lock, [this] () {
-        log(std::this_thread::get_id(), __FUNCTION__, "m_cv.wait");
+        log("m_cv.wait", __FUNCTION__);
         return !m_queue->empty();
     });
 
-    log(std::this_thread::get_id(), __FUNCTION__, "after m_cv.wait");
+    log("after m_cv.wait", __FUNCTION__);
 
     auto front_q = m_queue->front();
     m_queue->pop();
@@ -83,26 +80,16 @@ Sequence ObjectManager::sortSeqByRule(const Sequence &seq, const Rule &rule)
         sorted_subseq.emplace_back();
     }
 
-    for(auto item : seq)
-    {
+    for(auto item : seq) {
         if(item.getColor() == Color::NONE)
-        {
             continue;
-        }
 
-        if ( item.getColor() < rule[1])
-        {
+        if (item.getColor() == rule.at(0))
             sorted_subseq.at(0).push_back(item);
-        }
-        else if (item.getColor() > rule[1])
-        {
-            sorted_subseq.at(2).push_back(item);
-        }
-        else
-        {
+        else if (item.getColor() == rule.at(1))
             sorted_subseq.at(1).push_back(item);
-        }
-
+        else
+            sorted_subseq.at(2).push_back(item);
     }
 
     subseqJoining(sorted_seq, sorted_subseq);
@@ -113,8 +100,7 @@ Sequence ObjectManager::sortSeqByRule(const Sequence &seq, const Rule &rule)
 void ObjectManager::printSeq(const Sequence &seq)
 {
     std::string str;
-    for(auto item: seq)
-    {
+    for(auto item: seq) {
         switch (item.getColor()) {
         case Color::RED:
             str.push_back('R');
@@ -134,19 +120,20 @@ void ObjectManager::printSeq(const Sequence &seq)
     std::cout << str <<std::endl;
 }
 
-void ObjectManager::start()
+void ObjectManager::startAll()
 {
-    std::thread t2([this] {
+    std::thread t1([this] {
         while(true)
         {
-            printSeq(sortSeqByRule(getSeqFromQueue()));
+            auto seq = sortSeqByRule(getSeqFromQueue(), m_rule);
+            printSeq(seq);
             if(m_queue->empty() && m_creation_collection_finished)
                 break;
         }
 
     });
 
-    std::thread t1([this]{
+    std::thread t2([this] {
         for(auto i = 0; i < 100; i++)
             createRandomSeq(100);
         m_creation_collection_finished = true;
@@ -154,7 +141,22 @@ void ObjectManager::start()
 
     t1.detach();
     // t1.join();
-    t2.join();
+    t2.detach();
+    // t2.join();
+}
+
+void ObjectManager::setNewRule(std::string rule)
+{
+    m_rule.clear();
+    for(auto i : rule)
+    {
+        if (i == 'R' || i == 'r')
+            m_rule.push_back(Color::RED);
+        else if (i == 'G' || i == 'g')
+            m_rule.push_back(Color::GREEN);
+        else if (i == 'B' || i == 'b')
+            m_rule.push_back(Color::BLUE);
+    }
 }
 
 void ObjectManager::subseqJoining(Sequence &sorted_seq, const std::vector<Sequence> &sorted_subseq)
@@ -170,7 +172,8 @@ void ObjectManager::subseqJoining(Sequence &sorted_seq, const std::vector<Sequen
 
 
 
-void ObjectManager::log(std::thread::id t, const char*  f, const char* m)
+
+void ObjectManager::log(const char *m, const char *f, std::thread::id t)
 {
     std::cout << f << "\t" << t << "\t" << m << std::endl;
 }

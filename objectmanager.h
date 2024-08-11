@@ -37,22 +37,37 @@ public:
 
     void printSeq(const Sequence& seq);
 
-    void start();
+    void startAll();
+    void stopAll();
+    void startCreation(int number_sequences);
+    void stopCreation();
+    void startProcessint();
+    void stopProcessing();
+    void setNewRule(std::string rule);
 
-
-    void log(std::thread::id t, const char*  f, const char* m);
 
 private:
 
     Collection *m_queue = nullptr;
-    // Sequence *m_seq = nullptr;
-
-    std::mutex m_mt ;
-    std::condition_variable m_cv;
-
-    void subseqJoining(Sequence &sorted_seq, const std::vector<Sequence>& sorted_subseq);
 
     int cnt;
 
     bool m_creation_collection_finished = false;
+
+    bool m_creation_thread_started = false;
+    bool m_processing_thread_started = false;
+
+    Rule m_rule = {Color::RED, Color::GREEN, Color::BLUE};
+
+    std::mutex m_mt ;
+    std::condition_variable m_cv;
+
+
+    void subseqJoining(Sequence &sorted_seq,
+                       const std::vector<Sequence>& sorted_subseq);
+
+    void log(const char* m,
+             const char* f,
+             std::thread::id t = std::this_thread::get_id()
+             );
 };
