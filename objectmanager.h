@@ -1,7 +1,11 @@
 #pragma once
 
+#include <condition_variable>
+#include <mutex>
 #include <queue>
 #include <vector>
+#include <thread>
+
 
 #include "colorobject.h"
 
@@ -19,6 +23,7 @@ class ObjectManager
 {
 public:
     ObjectManager();
+    ~ObjectManager();
 
     void createRandomSeq(const int& number = 100);
     void addSeqToQeue(const Sequence & seq);
@@ -32,14 +37,20 @@ public:
 
     void printSeq(const Sequence& seq);
 
+    void start();
 
+
+    void log(std::thread::id t, const char*  f, const char* m);
 
 private:
 
     Collection *m_queue = nullptr;
     // Sequence *m_seq = nullptr;
 
+    std::mutex m_mt ;
+    std::condition_variable m_cv;
+
     void subseqJoining(Sequence &sorted_seq, const std::vector<Sequence>& sorted_subseq);
 
-
+    int cnt;
 };
