@@ -33,7 +33,9 @@ void ObjectManager::createRandomSeq(const int &number)
 
 
     log(std::this_thread::get_id(), __FUNCTION__, "before lock");
+
     std::unique_lock<std::mutex> lock(m_mt);
+
     log(std::this_thread::get_id(), __FUNCTION__, "after lock");
 
     addSeqToQeue(seq);
@@ -134,25 +136,24 @@ void ObjectManager::printSeq(const Sequence &seq)
 
 void ObjectManager::start()
 {
-    std::thread t1([this]{
-        for(auto i = 0; i < 100; i++)
-            createRandomSeq(100);
-    });
-
     std::thread t2([this] {
         while(true)
         {
-            auto s = getSeqFromQueue();
-            auto ss = sortSeqByRule(s);
-            // printSeq(ss);
-            if(m_queue->empty())
+            printSeq(sortSeqByRule(getSeqFromQueue()));
+            if(m_queue->empty() && m_creation_collection_finished)
                 break;
         }
 
     });
 
-    // t1.detach();
-    t1.join();
+    std::thread t1([this]{
+        for(auto i = 0; i < 100; i++)
+            createRandomSeq(100);
+        m_creation_collection_finished = true;
+    });
+
+    t1.detach();
+    // t1.join();
     t2.join();
 }
 

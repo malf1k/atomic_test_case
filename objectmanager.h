@@ -53,4 +53,6 @@ private:
     void subseqJoining(Sequence &sorted_seq, const std::vector<Sequence>& sorted_subseq);
 
     int cnt;
+
+    bool m_creation_collection_finished = false;
 };
