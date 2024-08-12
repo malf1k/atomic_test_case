@@ -8,7 +8,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_executable(atomic_test_case
     main.cxx
     colorobject.h
-    colorobject.cxx
     objectmanager.h
     objectmanager.cxx
 )

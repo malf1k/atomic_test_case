@@ -41,6 +41,7 @@ void ObjectManager::createRandomSeq(const int &number)
     addSeqToQeue(seq);
     log("before notyfy_one", __FUNCTION__);
     m_cv.notify_one();
+    log("after notyfy_one", __FUNCTION__);
 }
 
 void ObjectManager::addSeqToQeue(const Sequence &seq)
@@ -65,6 +66,7 @@ Sequence ObjectManager::getSeqFromQueue()
 
     auto front_q = m_queue->front();
     m_queue->pop();
+    log("after pop", __FUNCTION__);
 
     return std::move(front_q);
 }
@@ -120,29 +122,95 @@ void ObjectManager::printSeq(const Sequence &seq)
     std::cout << str <<std::endl;
 }
 
-void ObjectManager::startAll()
+void ObjectManager::startAll(const int &number_sequences)
 {
-    std::thread t1([this] {
-        while(true)
+    startCreation(number_sequences);
+    startProcessing();
+
+}
+
+void ObjectManager::stopAll()
+{
+    stopCreation();
+    stopProcessing();
+}
+
+
+
+void ObjectManager::startCreation(const int &number_sequences)
+{
+    if(m_creation_thread_started == true)
+        std::cout << "creation_thread is work" << std::endl;
+    else {
+        m_creation_thread_started = true;
+        m_creation_tread_stop = false;
+        std::thread t([this, &number_sequences] {
+            for(auto i = 0; i < number_sequences; i++)
+            {
+                log("befor check creation stop", __FUNCTION__);
+                if(m_creation_tread_stop == true)
+                {
+                    log("after check creation stop - stop", __FUNCTION__);
+                    break;
+                }
+                log("after check creation stop - continue", __FUNCTION__);
+                createRandomSeq(100);
+                log("aftet createRandomSeq", __FUNCTION__);
+
+            }
+            m_creation_collection_finished = true;
+            m_creation_thread_started = false;
+        });
+
+        if(t.joinable())
         {
-            auto seq = sortSeqByRule(getSeqFromQueue(), m_rule);
-            printSeq(seq);
-            if(m_queue->empty() && m_creation_collection_finished)
-                break;
+            t.detach();
+            // t.join();
         }
+    }
+}
 
-    });
+void ObjectManager::stopCreation()
+{
+    m_creation_tread_stop = true;
+}
 
-    std::thread t2([this] {
-        for(auto i = 0; i < 100; i++)
-            createRandomSeq(100);
-        m_creation_collection_finished = true;
-    });
+void ObjectManager::startProcessing()
+{
+    if(m_processing_thread_started == true)
+        std::cout << "processing_thread is work" << std::endl;
+    else {
+        m_processing_thread_started = true;
+        std::thread t([this] {
+            m_processing_thread_stop = false;
 
-    t1.detach();
-    // t1.join();
-    t2.detach();
-    // t2.join();
+            while(!m_processing_thread_stop)
+            {
+                log("befor check processing stop - continue", __FUNCTION__);
+                auto seq = sortSeqByRule(getSeqFromQueue(), m_rule);
+                printSeq(seq);
+                if(m_queue->empty() && m_creation_collection_finished)
+                {
+                    log("processing break", __FUNCTION__);
+                    break;
+                }
+            }
+            m_processing_thread_started = false;
+        });
+
+        if(t.joinable())
+        {
+            t.detach();
+            // t.join();
+        }
+    }
+
+
+}
+
+void ObjectManager::stopProcessing()
+{
+    m_processing_thread_stop = true;
 }
 
 void ObjectManager::setNewRule(std::string rule)

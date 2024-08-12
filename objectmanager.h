@@ -37,11 +37,11 @@ public:
 
     void printSeq(const Sequence& seq);
 
-    void startAll();
+    void startAll(const int& number_sequences = 100);
     void stopAll();
-    void startCreation(int number_sequences);
+    void startCreation(const int& number_sequences);
     void stopCreation();
-    void startProcessint();
+    void startProcessing();
     void stopProcessing();
     void setNewRule(std::string rule);
 
@@ -52,10 +52,12 @@ private:
 
     int cnt;
 
-    bool m_creation_collection_finished = false;
+    std::atomic<bool> m_creation_collection_finished = false;
 
-    bool m_creation_thread_started = false;
-    bool m_processing_thread_started = false;
+    std::atomic<bool> m_creation_thread_started = false;
+    std::atomic<bool> m_processing_thread_started = false;
+    std::atomic<bool> m_creation_tread_stop = false;
+    std::atomic<bool> m_processing_thread_stop = false;
 
     Rule m_rule = {Color::RED, Color::GREEN, Color::BLUE};
 

@@ -14,10 +14,21 @@ enum class Color{
 class ColorObject
 {
 public:
-    ColorObject(Color color = Color::NONE);
+    ColorObject(Color color = Color::NONE)
+        : m_color(color)
+    {
 
-    void setColor(Color color);
-    Color getColor();
+    }
+
+    void setColor(Color color)
+    {
+        m_color = color;
+
+    }
+    Color getColor()
+    {
+        return m_color;
+    }
 
 private:
     Color m_color = Color::NONE;
