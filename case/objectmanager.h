@@ -5,6 +5,7 @@
 #include <queue>
 #include <vector>
 #include <thread>
+#include <atomic>
 
 
 #include "colorobject.h"
