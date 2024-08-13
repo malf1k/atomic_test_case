@@ -1,19 +1,9 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(atomic_test_case LANGUAGES CXX)
+project(atomiq_test_case LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_executable(atomic_test_case
-    main.cxx
-    colorobject.h
-    objectmanager.h
-    objectmanager.cxx
-)
-
-include(GNUInstallDirs)
-install(TARGETS atomic_test_case
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-)
+add_subdirectory(case)
+add_subdirectory(tests)
