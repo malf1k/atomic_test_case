@@ -2,8 +2,6 @@
 #include <catch2/generators/catch_generators.hpp>
 #include <catch2/benchmark/catch_benchmark.hpp>
 
-#include <cstdint>
-
 
 #include "objectmanager.h"
 
@@ -22,46 +20,42 @@ TEST_CASE("Generate numbers in sequence")
 TEST_CASE("Sorting seq")
 {
     ObjectManager om;
-    Sequence res = {Color::RED, Color::GREEN, Color::BLUE};
-    auto result = om.sortSeqByRule(res);
-    REQUIRE(res == result);
+    Sequence test_seq = {Color::GREEN, Color::BLUE, Color::RED};
+    Sequence ref;
+
+    auto rule_gen = GENERATE(Rule({Color::GREEN, Color::BLUE, Color::RED}),
+                      Rule({Color::RED, Color::GREEN, Color::BLUE}),
+                      Rule({Color::BLUE, Color::RED, Color::GREEN})
+                      );
+
+    SECTION("RuleSorting first")
+    {
+        for(auto item : rule_gen)
+            ref.push_back(item);
+        auto result_f = om.sortSeqByRule(test_seq, rule_gen);
+        REQUIRE(ref == result_f);
+    }
+    SECTION("RuleSorting second")
+    {
+        for(int iter = 0; iter < 10; iter++)
+        {
+            for(auto item : rule_gen)
+            {
+                ref.push_back(item);
+            }
+        }
+        auto result_f = om.sortSeqByRule(ref, rule_gen);
+        auto curren_rule_position = 0;
+        for(auto im : result_f) {
+            if(im.getColor() == rule_gen.at(curren_rule_position))
+                continue;
+            else if(im == rule_gen.at(curren_rule_position + 1))
+                curren_rule_position++;
+            else {
+                REQUIRE(false);
+            }
+        }
+        REQUIRE(true);
+    }
 }
 
-
-// uint64_t fibonacci(uint64_t number) {
-//     return number < 2 ? number : fibonacci(number - 1) + fibonacci(number - 2);
-// }
-
-// uint32_t factorial( uint32_t number ) {
-//     return number <= 1 ? number : factorial(number-1) * number;
-// }
-
-// bool is_odd(int value) {
-//     return value % 2;
-// }
-
-// TEST_CASE( "Factorials are computed", "[factorial]" ) {
-//     REQUIRE( factorial( 1) == 1 );
-//     REQUIRE( factorial( 2) == 2 );
-//     REQUIRE( factorial( 3) == 6 );
-//     REQUIRE( factorial(10) == 3'628'800 );
-// }
-
-// TEST_CASE("Benchmark Fibonacci", "[!benchmark]") {
-//     REQUIRE(fibonacci(5) == 5);
-
-//     REQUIRE(fibonacci(20) == 6'765);
-//     BENCHMARK("fibonacci 20") {
-//         return fibonacci(20);
-//     };
-
-//     REQUIRE(fibonacci(25) == 75'025);
-//     BENCHMARK("fibonacci 25") {
-//         return fibonacci(25);
-//     };
-// }
-
-// TEST_CASE("Generators", "[generator]") {
-//     auto i = GENERATE(1, 3, 5);
-//     REQUIRE(is_odd(i));
-// }

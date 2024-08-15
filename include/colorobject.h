@@ -30,7 +30,17 @@ public:
         return m_color;
     }
 
+    friend bool operator == (const ColorObject& co1, const ColorObject& co2)
+    {
+        return co1.m_color == co2.m_color;
+    }
+    friend bool operator != (const ColorObject& co1, const ColorObject& co2)
+    {
+        return !(co1 == co2);
+    }
 
 private:
     Color m_color = Color::NONE;
 };
+
+
