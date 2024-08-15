@@ -30,6 +30,7 @@ public:
         return m_color;
     }
 
+
 private:
     Color m_color = Color::NONE;
 };
