@@ -6,13 +6,18 @@ project(${TARGET} LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+message (CMAKE_CURRENT_SOURCE_DIR = ${CMAKE_CURRENT_SOURCE_DIR})
+
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
+
 add_executable(${TARGET}
-    src/main.cxx
-    includes/colorobject.h
-    includes/objectmanager.h
-    src/objectmanager.cxx
+    scr/main.cxx
+    scr/objectmanager.cxx
+    include/colorobject.h
+    include/objectmanager.h
 )
 
+add_subdirectory(tests)
 
 
 include(GNUInstallDirs)

@@ -14,6 +14,6 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(Catch2)
 
-add_executable(${TARGET} foo.cxx)
+add_executable(${TARGET} tests.cxx)
 target_link_libraries(${TARGET} PRIVATE Catch2::Catch2WithMain)
 
