@@ -73,15 +73,6 @@ int main()
         {
             break;
         }
-
-
-        // if(input == "exit" || input == "7")
-        //     break;
-        // else if(input == "start_all")
-        //     om.start_all();
-        // else
-        //     cout << endl << "This command \"" << input <<"\" is undef " << endl;
-        // cout << endl;
     }
 
     return 0;

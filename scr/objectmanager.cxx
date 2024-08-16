@@ -8,16 +8,11 @@ using namespace std::chrono_literals;
 ObjectManager::ObjectManager() {
 
     cnt = 0;
-    m_queue = new Collection;
+    m_queue = std::make_unique<Collection>();
 }
 
 ObjectManager::~ObjectManager()
 {
-    if(m_queue) {
-        delete m_queue;
-        m_queue = nullptr;
-    }
-
 }
 
 void ObjectManager::createRandomSeq(const int &number)
@@ -46,8 +41,6 @@ void ObjectManager::createRandomSeq(const int &number)
 
 void ObjectManager::addSeqToQeue(const Sequence &seq)
 {
-    if (m_queue == nullptr)
-        m_queue = new Collection;
     m_queue->push(seq);
 }
 
@@ -99,28 +92,6 @@ Sequence ObjectManager::sortSeqByRule(const Sequence &seq, const Rule &rule)
     return sorted_seq;
 }
 
-void ObjectManager::printSeq(const Sequence &seq)
-{
-    std::string str;
-    for(auto item: seq) {
-        switch (item.getColor()) {
-        case Color::RED:
-            str.push_back('R');
-            break;
-        case Color::GREEN:
-            str.push_back('G');
-            break;
-        case Color::BLUE:
-            str.push_back('B');
-            break;
-        default:
-            str.push_back('N');
-            break;
-        }
-        str.push_back(' ');
-    }
-    std::cout << str <<std::endl;
-}
 
 void ObjectManager::startAll(const int &number_sequences)
 {
@@ -230,15 +201,35 @@ void ObjectManager::setNewRule(std::string rule)
 void ObjectManager::subseqJoining(Sequence &sorted_seq, const std::vector<Sequence> &sorted_subseq)
 {
     for(auto item_seq : sorted_subseq)
-    {
-        // FIXME: тут может быть проблема, требуется отладка
         sorted_seq.insert(sorted_seq.end(),
                           item_seq.begin(),
                           item_seq.end());
-    }
 }
 
 
+
+void ObjectManager::printSeq(const Sequence &seq)
+{
+    std::string str;
+    for(auto item: seq) {
+        switch (item.getColor()) {
+        case Color::RED:
+            str.push_back('R');
+            break;
+        case Color::GREEN:
+            str.push_back('G');
+            break;
+        case Color::BLUE:
+            str.push_back('B');
+            break;
+        default:
+            str.push_back('N');
+            break;
+        }
+        str.push_back(' ');
+    }
+    std::cout << str <<std::endl;
+}
 
 
 void ObjectManager::log(const char *m, const char *f, std::thread::id t)

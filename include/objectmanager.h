@@ -49,7 +49,8 @@ public:
 
 private:
 
-    Collection *m_queue = nullptr;
+    std::unique_ptr<Collection> m_queue;
+    // Collection *m_queue = nullptr;
 
     int cnt;
 
