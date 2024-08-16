@@ -5,6 +5,15 @@
 
 using namespace std;
 
+uint32_t setNumber(const string& message)
+{
+    uint32_t number;
+    cout << message << endl;
+    cin >> number;
+
+    return number;
+}
+
 int main()
 {
 
@@ -29,11 +38,9 @@ int main()
 
         if(input == "1" || input == "start_creation")
         {
-            uint number_sequences;
-            cout << "Set number_sequence" << endl;
-            cin >> number_sequences;
-
-            om.startCreation(number_sequences);
+            uint32_t number_sequences = setNumber("Set number of sequence");
+            uint32_t elements_in_sequence = setNumber("Set elements in sequence");
+            om.startCreation(number_sequences, elements_in_sequence);
         }
         else if( input == "2" || input == "stop_creation")
         {
@@ -49,10 +56,9 @@ int main()
         }
         else if( input == "5" || input == "start_all")
         {
-            uint number_sequences;
-            cout << "Set number_sequence" << endl;
-            cin >> number_sequences;
-            om.startAll(number_sequences);
+            uint32_t number_sequences = setNumber("Set number of sequence");
+            uint32_t elements_in_sequence = setNumber("Set elements in sequence");
+            om.startAll(number_sequences, elements_in_sequence);
         }
         else if( input == "6" || input == "stop_all")
         {
@@ -61,7 +67,7 @@ int main()
         else if( input == "7" || input == "set_new_rule")
         {
             string new_rule;
-            cout << "set new rule if format: R<G<B or RGB or rgb" << endl;
+            cout << "Set new rule if format: R<G<B or RGB or rgb" << endl;
             getline(cin, new_rule);
             om.setNewRule(new_rule);
         }

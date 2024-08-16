@@ -26,7 +26,7 @@ public:
     ObjectManager();
     ~ObjectManager();
 
-    void createRandomSeq(const int& number = 100);
+    void createRandomSeq(const uint32_t elements_in_sequence = 10);
     void addSeqToQeue(const Sequence & seq);
 
 
@@ -38,9 +38,11 @@ public:
 
     void printSeq(const Sequence& seq);
 
-    void startAll(const int& number_sequences = 100);
+    void startAll(const uint32_t number_sequences = 100,
+                  const uint32_t elements_in_sequence = 10);
     void stopAll();
-    void startCreation(const int& number_sequences);
+    void startCreation(const uint32_t number_sequences = 100,
+                       const uint32_t elements_in_sequence = 10);
     void stopCreation();
     void startProcessing();
     void stopProcessing();

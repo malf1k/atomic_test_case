@@ -15,7 +15,7 @@ ObjectManager::~ObjectManager()
 {
 }
 
-void ObjectManager::createRandomSeq(const int &number)
+void ObjectManager::createRandomSeq(const uint32_t elements_in_sequence)
 {
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -23,7 +23,7 @@ void ObjectManager::createRandomSeq(const int &number)
 
     Sequence seq ;
 
-    for(auto i = 0; i < number; i++)
+    for(auto i = 0; i < elements_in_sequence; i++)
         seq.push_back(static_cast<Color>(dist(gen)));
 
 
@@ -93,11 +93,10 @@ Sequence ObjectManager::sortSeqByRule(const Sequence &seq, const Rule &rule)
 }
 
 
-void ObjectManager::startAll(const int &number_sequences)
+void ObjectManager::startAll(const uint32_t number_sequences, const uint32_t elements_in_sequence)
 {
-    startCreation(number_sequences);
+    startCreation(number_sequences, elements_in_sequence);
     startProcessing();
-
 }
 
 void ObjectManager::stopAll()
@@ -108,14 +107,14 @@ void ObjectManager::stopAll()
 
 
 
-void ObjectManager::startCreation(const int &number_sequences)
+void ObjectManager::startCreation(const uint32_t number_sequences, const uint32_t elements_in_sequence)
 {
     if(m_creation_thread_started == true)
         std::cout << "creation_thread is work" << std::endl;
     else {
         m_creation_thread_started = true;
         m_creation_tread_stop = false;
-        std::thread t([this, &number_sequences] {
+        std::thread t([this, &number_sequences, &elements_in_sequence] {
             for(auto i = 0; i < number_sequences; i++)
             {
                 log("befor check creation stop", __FUNCTION__);
@@ -125,7 +124,7 @@ void ObjectManager::startCreation(const int &number_sequences)
                     break;
                 }
                 log("after check creation stop - continue", __FUNCTION__);
-                createRandomSeq(100);
+                createRandomSeq(elements_in_sequence);
                 log("aftet createRandomSeq", __FUNCTION__);
 
             }
