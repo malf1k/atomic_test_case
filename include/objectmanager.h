@@ -141,7 +141,13 @@ private:
      * @param seq - последовательность для добавления в очередь
      */
     void addSeqToQueue(const Sequence& seq);
-
+    /**
+     * @brief subseqJoining - функция объединяет в обзую последовательность набор
+     * @param [out] sorted_seq - объединенная апоследовательность
+     * @param [in] sorted_subseq - набор последовательностей для конкатинации последовтельностей
+     */
+    void subseqJoining(Sequence &sorted_seq,
+                       const std::vector<Sequence>& sorted_subseq);
     /**
      * @brief printSeq - вспомогательная функция для вывода и отображдения последовательности
      * @param seq - последовательность которую требуется отобразить

@@ -40,37 +40,46 @@ Sequence ObjectManager::getSeqFromQueue()
 {
     std::unique_lock<std::mutex> lock(m_mt);
     m_cv.wait(lock, [this] () {
-        return !m_queue->empty();
+        return !m_queue->empty() || m_stop_processing_thread;
     });
 
-    auto front_q = m_queue->front();
-    m_queue->pop();
-
-    return std::move(front_q);
+    if(!m_queue->empty())
+    {
+        auto front_q = m_queue->front();
+        m_queue->pop();
+        return std::move(front_q);
+    }
+    else
+        return Sequence();
 }
 
 Sequence ObjectManager::sortSeqByRule(const Sequence &seq, const Rule &rule)
 {
     Sequence sorted_seq;
+    if(!seq.empty())
+    {
+        std::vector<Sequence> sorted_subseq;
+        sorted_subseq.reserve(rule.size());
 
-    std::vector<Sequence> sorted_subseq;
-    sorted_subseq.reserve(rule.size());
+        for (size_t i = 0; i < rule.size(); ++i)
+            sorted_subseq.emplace_back();
 
-    for (size_t i = 0; i < rule.size(); ++i)
-        sorted_subseq.emplace_back();
+        for(auto item : seq) {
+            if(item.getColor() == Color::NONE)
+                continue;
 
-    for(auto item : seq) {
-        if(item.getColor() == Color::NONE)
-            continue;
-
-        if (item.getColor() == rule.at(0))
-            sorted_subseq.at(0).push_back(item);
-        else if (item.getColor() == rule.at(1))
-            sorted_subseq.at(1).push_back(item);
-        else
-            sorted_subseq.at(2).push_back(item);
+            if (item.getColor() == rule.at(0))
+                sorted_subseq.at(0).push_back(item);
+            else if (item.getColor() == rule.at(1))
+                sorted_subseq.at(1).push_back(item);
+            else
+                sorted_subseq.at(2).push_back(item);
+        }
+        for(auto item_seq : sorted_subseq)
+            sorted_seq.insert(sorted_seq.end(),
+                              item_seq.begin(),
+                              item_seq.end());
     }
-    subseqJoining(sorted_seq, sorted_subseq);
     return sorted_seq;
 }
 
@@ -86,8 +95,6 @@ void ObjectManager::stopAll()
     stopCreation();
     stopProcessing();
 }
-
-
 
 void ObjectManager::startCreation(const uint32_t number_sequences,
                                   const uint32_t elements_in_sequence)
@@ -131,13 +138,12 @@ void ObjectManager::startProcessing()
             while(!m_stop_processing_thread)
             {
                 auto seq = sortSeqByRule(getSeqFromQueue(), m_rule);
+                if(seq.empty())
+                    break;
                 printSeq(seq);
                 std::unique_lock<std::mutex> lock(m_mt);
                 if(m_queue->empty() && m_creation_collection_finished)
-                {
-                    m_processing_thread_started = false;
                     break;
-                }
             }
             m_processing_thread_started = false;
         });
@@ -150,6 +156,7 @@ void ObjectManager::startProcessing()
 void ObjectManager::stopProcessing()
 {
     m_stop_processing_thread = true;
+    m_cv.notify_all();
 }
 
 void ObjectManager::setNewRule(std::string rule)
@@ -165,16 +172,6 @@ void ObjectManager::setNewRule(std::string rule)
             m_rule.push_back(Color::BLUE);
     }
 }
-
-void ObjectManager::subseqJoining(Sequence &sorted_seq, const std::vector<Sequence> &sorted_subseq)
-{
-    for(auto item_seq : sorted_subseq)
-        sorted_seq.insert(sorted_seq.end(),
-                          item_seq.begin(),
-                          item_seq.end());
-}
-
-
 
 void ObjectManager::printSeq(const Sequence &seq)
 {

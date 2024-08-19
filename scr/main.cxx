@@ -84,8 +84,11 @@ int main()
         }
         else
         {
-            cout << "This command not definition - " << input << endl;
-            sendStartMessage();
+            if(input != "")
+            {
+                cout << "This command not definition - " << input << endl;
+                sendStartMessage();
+            }
         }
     }
 
