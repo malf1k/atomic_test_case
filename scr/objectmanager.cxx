@@ -7,7 +7,6 @@ using namespace std::chrono_literals;
 
 ObjectManager::ObjectManager() {
 
-    cnt = 0;
     m_queue = std::make_unique<Collection>();
 }
 
@@ -26,17 +25,10 @@ void ObjectManager::createRandomSeq(const uint32_t elements_in_sequence)
     for(auto i = 0; i < elements_in_sequence; i++)
         seq.push_back(static_cast<Color>(dist(gen)));
 
-
-    log("before lock", __FUNCTION__);
-
     std::unique_lock<std::mutex> lock(m_mt);
 
-    log("after lock", __FUNCTION__);
-
     addSeqToQeue(seq);
-    log("before notyfy_one", __FUNCTION__);
     m_cv.notify_one();
-    log("after notyfy_one", __FUNCTION__);
 }
 
 void ObjectManager::addSeqToQeue(const Sequence &seq)
@@ -46,20 +38,13 @@ void ObjectManager::addSeqToQeue(const Sequence &seq)
 
 Sequence ObjectManager::getSeqFromQueue()
 {
-    cnt ++;
-    std::cout <<cnt << "\t";
-    log("lock(m_mt)", __FUNCTION__);
     std::unique_lock<std::mutex> lock(m_mt);
     m_cv.wait(lock, [this] () {
-        log("m_cv.wait", __FUNCTION__);
         return !m_queue->empty();
     });
 
-    log("after m_cv.wait", __FUNCTION__);
-
     auto front_q = m_queue->front();
     m_queue->pop();
-    log("after pop", __FUNCTION__);
 
     return std::move(front_q);
 }
@@ -71,9 +56,8 @@ Sequence ObjectManager::sortSeqByRule(const Sequence &seq, const Rule &rule)
     std::vector<Sequence> sorted_subseq;
     sorted_subseq.reserve(rule.size());
 
-    for (size_t i = 0; i < rule.size(); ++i) {
+    for (size_t i = 0; i < rule.size(); ++i)
         sorted_subseq.emplace_back();
-    }
 
     for(auto item : seq) {
         if(item.getColor() == Color::NONE)
@@ -86,9 +70,7 @@ Sequence ObjectManager::sortSeqByRule(const Sequence &seq, const Rule &rule)
         else
             sorted_subseq.at(2).push_back(item);
     }
-
     subseqJoining(sorted_seq, sorted_subseq);
-
     return sorted_seq;
 }
 
@@ -119,27 +101,18 @@ void ObjectManager::startCreation(const uint32_t number_sequences,
         std::thread t([this, number_sequences, elements_in_sequence] {
             for(auto i = 0; i < number_sequences; i++)
             {
-                log("befor check creation stop", __FUNCTION__);\
-
                 if(m_creation_tread_stop == true)
                 {
-                    log("after check creation stop - stop", __FUNCTION__);
                     break;
                 }
-                log("after check creation stop - continue", __FUNCTION__);
                 createRandomSeq(elements_in_sequence);
-                log("aftet createRandomSeq", __FUNCTION__);
-
             }
             m_creation_collection_finished = true;
             m_creation_thread_started = false;
         });
 
         if(t.joinable())
-        {
             t.detach();
-            // t.join();
-        }
     }
 }
 
@@ -159,13 +132,11 @@ void ObjectManager::startProcessing()
 
             while(!m_processing_thread_stop)
             {
-                log("befor check processing stop - continue", __FUNCTION__);
                 auto seq = sortSeqByRule(getSeqFromQueue(), m_rule);
                 printSeq(seq);
                 std::unique_lock<std::mutex> lock(m_mt);
                 if(m_queue->empty() && m_creation_collection_finished)
                 {
-                    log("processing break", __FUNCTION__);
                     m_processing_thread_started = false;
                     break;
                 }
@@ -174,10 +145,7 @@ void ObjectManager::startProcessing()
         });
 
         if(t.joinable())
-        {
             t.detach();
-            // t.join();
-        }
     }
 }
 
