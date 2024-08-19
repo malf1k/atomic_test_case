@@ -59,6 +59,7 @@ int main()
             uint32_t number_sequences = setNumber("Set number of sequence");
             uint32_t elements_in_sequence = setNumber("Set elements in sequence");
             om.startAll(number_sequences, elements_in_sequence);
+
         }
         else if( input == "6" || input == "stop_all")
         {
@@ -77,6 +78,7 @@ int main()
         }
         else if( input == "0" || input == "exit")
         {
+            om.stopAll();
             break;
         }
     }

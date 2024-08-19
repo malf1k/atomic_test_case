@@ -107,17 +107,20 @@ void ObjectManager::stopAll()
 
 
 
-void ObjectManager::startCreation(const uint32_t number_sequences, const uint32_t elements_in_sequence)
+void ObjectManager::startCreation(const uint32_t number_sequences,
+                                  const uint32_t elements_in_sequence)
 {
     if(m_creation_thread_started == true)
         std::cout << "creation_thread is work" << std::endl;
     else {
         m_creation_thread_started = true;
         m_creation_tread_stop = false;
-        std::thread t([this, &number_sequences, &elements_in_sequence] {
+        m_creation_collection_finished = false;
+        std::thread t([this, number_sequences, elements_in_sequence] {
             for(auto i = 0; i < number_sequences; i++)
             {
-                log("befor check creation stop", __FUNCTION__);
+                log("befor check creation stop", __FUNCTION__);\
+
                 if(m_creation_tread_stop == true)
                 {
                     log("after check creation stop - stop", __FUNCTION__);
@@ -159,9 +162,11 @@ void ObjectManager::startProcessing()
                 log("befor check processing stop - continue", __FUNCTION__);
                 auto seq = sortSeqByRule(getSeqFromQueue(), m_rule);
                 printSeq(seq);
+                std::unique_lock<std::mutex> lock(m_mt);
                 if(m_queue->empty() && m_creation_collection_finished)
                 {
                     log("processing break", __FUNCTION__);
+                    m_processing_thread_started = false;
                     break;
                 }
             }
@@ -174,8 +179,6 @@ void ObjectManager::startProcessing()
             // t.join();
         }
     }
-
-
 }
 
 void ObjectManager::stopProcessing()
