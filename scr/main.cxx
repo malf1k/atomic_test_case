@@ -10,15 +10,11 @@ uint32_t setNumber(const string& message)
     uint32_t number;
     cout << message << endl;
     cin >> number;
-
     return number;
 }
 
-int main()
+void sendStartMessage()
 {
-
-
-    ObjectManager om;
     string start_message = "Allow commands:\n"s +
                            "1: \tstart_creation\n"s +
                            "2: \tstop_creation\n"s +
@@ -29,8 +25,14 @@ int main()
                            "7: \tset_new_rule\n"s +
                            "?: \tshow start_message\n"s +
                            "0: \texit\n"s
-                           ;
+        ;
     cout << start_message;
+}
+
+int main()
+{
+    ObjectManager om;
+    sendStartMessage();
     string input;
     while(true)
     {
@@ -59,7 +61,6 @@ int main()
             uint32_t number_sequences = setNumber("Set number of sequence");
             uint32_t elements_in_sequence = setNumber("Set elements in sequence");
             om.startAll(number_sequences, elements_in_sequence);
-
         }
         else if( input == "6" || input == "stop_all")
         {
@@ -74,12 +75,17 @@ int main()
         }
         else if( input == "?")
         {
-            cout << start_message;
+            sendStartMessage();
         }
         else if( input == "0" || input == "exit")
         {
             om.stopAll();
             break;
+        }
+        else
+        {
+            cout << "This command not definition - " << input << endl;
+            sendStartMessage();
         }
     }
 

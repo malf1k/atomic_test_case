@@ -16,17 +16,18 @@ ObjectManager::~ObjectManager()
 
 void ObjectManager::createRandomSeq(const uint32_t elements_in_sequence)
 {
-    std::random_device rd;
-    std::mt19937 gen(rd());
+    uint32_t seed1 = std::chrono::system_clock::now().time_since_epoch().count();
+    std::mt19937 gen(seed1);
     std::uniform_int_distribution<int> dist(1, 3);
 
     Sequence seq;
 
-    for(auto i = 0; i < elements_in_sequence; i++)
+
+    for(auto i = 0; i < elements_in_sequence; i++){
         seq.push_back(static_cast<Color>(dist(gen)));
-
+    }
     std::unique_lock<std::mutex> lock(m_mt);
-
+    printSeq(seq);
     addSeqToQueue(seq);
     m_cv.notify_one();
 }
