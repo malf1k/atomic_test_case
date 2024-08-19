@@ -20,18 +20,18 @@ void ObjectManager::createRandomSeq(const uint32_t elements_in_sequence)
     std::mt19937 gen(rd());
     std::uniform_int_distribution<int> dist(1, 3);
 
-    Sequence seq ;
+    Sequence seq;
 
     for(auto i = 0; i < elements_in_sequence; i++)
         seq.push_back(static_cast<Color>(dist(gen)));
 
     std::unique_lock<std::mutex> lock(m_mt);
 
-    addSeqToQeue(seq);
+    addSeqToQueue(seq);
     m_cv.notify_one();
 }
 
-void ObjectManager::addSeqToQeue(const Sequence &seq)
+void ObjectManager::addSeqToQueue(const Sequence &seq)
 {
     m_queue->push(seq);
 }
@@ -102,9 +102,7 @@ void ObjectManager::startCreation(const uint32_t number_sequences,
             for(auto i = 0; i < number_sequences; i++)
             {
                 if(m_creation_tread_stop == true)
-                {
                     break;
-                }
                 createRandomSeq(elements_in_sequence);
             }
             m_creation_collection_finished = true;

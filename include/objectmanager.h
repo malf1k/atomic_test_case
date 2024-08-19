@@ -27,50 +27,43 @@ public:
     ~ObjectManager();
 
     void createRandomSeq(const uint32_t elements_in_sequence = 10);
-    void addSeqToQeue(const Sequence & seq);
-
-
-    Sequence getSeqFromQueue();
     Sequence sortSeqByRule(const Sequence& seq,
-                           const Rule &rule =
-                           {Color::RED, Color::GREEN, Color::BLUE}
-                           );
-
-    void printSeq(const Sequence& seq);
-
-    void startAll(const uint32_t number_sequences = 100,
-                  const uint32_t elements_in_sequence = 10);
-    void stopAll();
-    void startCreation(const uint32_t number_sequences = 100,
-                       const uint32_t elements_in_sequence = 10);
-    void stopCreation();
-    void startProcessing();
-    void stopProcessing();
+                           const Rule& rule =
+                           {Color::RED, Color::GREEN, Color::BLUE});
+    Sequence getSeqFromQueue();
     void setNewRule(std::string rule);
 
 
+    void startCreation(const uint32_t number_sequences = 100,
+                       const uint32_t elements_in_sequence = 10);
+    void startProcessing();
+    void startAll(const uint32_t number_sequences = 100,
+                  const uint32_t elements_in_sequence = 10);
+
+    void stopCreation();
+    void stopProcessing();
+    void stopAll();
+
 private:
 
+    Rule m_rule = {Color::RED, Color::GREEN, Color::BLUE};
     std::unique_ptr<Collection> m_queue;
-    // Collection *m_queue = nullptr;
-
-    int cnt;
 
     std::atomic<bool> m_creation_collection_finished = false;
-
     std::atomic<bool> m_creation_thread_started = false;
     std::atomic<bool> m_processing_thread_started = false;
     std::atomic<bool> m_creation_tread_stop = false;
     std::atomic<bool> m_processing_thread_stop = false;
 
-    Rule m_rule = {Color::RED, Color::GREEN, Color::BLUE};
-
     std::mutex m_mt ;
     std::condition_variable m_cv;
 
+    void addSeqToQueue(const Sequence& seq);
 
     void subseqJoining(Sequence &sorted_seq,
                        const std::vector<Sequence>& sorted_subseq);
+
+    void printSeq(const Sequence& seq);
 
     void log(const char* m,
              const char* f,
