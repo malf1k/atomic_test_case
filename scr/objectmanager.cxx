@@ -22,12 +22,11 @@ void ObjectManager::createRandomSeq(const uint32_t elements_in_sequence)
 
     Sequence seq;
 
-
     for(auto i = 0; i < elements_in_sequence; i++){
         seq.push_back(static_cast<Color>(dist(gen)));
     }
     std::unique_lock<std::mutex> lock(m_mt);
-    printSeq(seq);
+    // printSeq(seq);
     addSeqToQueue(seq);
     m_cv.notify_one();
 }
@@ -97,12 +96,12 @@ void ObjectManager::startCreation(const uint32_t number_sequences,
         std::cout << "creation_thread is work" << std::endl;
     else {
         m_creation_thread_started = true;
-        m_creation_tread_stop = false;
+        m_stop_creation_tread = false;
         m_creation_collection_finished = false;
         std::thread t([this, number_sequences, elements_in_sequence] {
             for(auto i = 0; i < number_sequences; i++)
             {
-                if(m_creation_tread_stop == true)
+                if(m_stop_creation_tread == true)
                     break;
                 createRandomSeq(elements_in_sequence);
             }
@@ -117,7 +116,7 @@ void ObjectManager::startCreation(const uint32_t number_sequences,
 
 void ObjectManager::stopCreation()
 {
-    m_creation_tread_stop = true;
+    m_stop_creation_tread = true;
 }
 
 void ObjectManager::startProcessing()
@@ -127,9 +126,9 @@ void ObjectManager::startProcessing()
     else {
         m_processing_thread_started = true;
         std::thread t([this] {
-            m_processing_thread_stop = false;
+            m_stop_processing_thread = false;
 
-            while(!m_processing_thread_stop)
+            while(!m_stop_processing_thread)
             {
                 auto seq = sortSeqByRule(getSeqFromQueue(), m_rule);
                 printSeq(seq);
@@ -150,7 +149,7 @@ void ObjectManager::startProcessing()
 
 void ObjectManager::stopProcessing()
 {
-    m_processing_thread_stop = true;
+    m_stop_processing_thread = true;
 }
 
 void ObjectManager::setNewRule(std::string rule)
